@@ -1,0 +1,57 @@
+import './styles.css'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+
+//components
+import Slide from "../../components/layout/slide"
+
+//api
+import api from '../../services/api'
+
+function Home() {
+    const [products, setProdutos] = useState([])
+    const [token] = useState(localStorage.getItem('token') || '')
+
+    useEffect(() => {
+        api.get('/products', {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(token)}`,
+            },
+        })
+            .then(response => setProdutos(response.data.products))
+    }, [token])
+
+    // products.map(product => {
+    //     console.log(product)
+    // })
+
+    return (
+        <>
+            <Slide />
+            <section className="content">
+                <div className='product-emphasis'>
+                    {products.length > 0 &&
+                        products.map(product => (
+                            <Link to='' key={product.id}>
+                                <div className='cart'>
+                                    <img
+                                        src={`${process.env.REACT_APP_API}/images/products/${product.images}`}
+                                    />
+                                    {product.images}
+                                    <span className='text'>
+                                        <h3>{`R$ ${product.price},00`} </h3>
+                                        <h3>{product.name}</h3>
+                                        <small className='description'>
+                                            {product.description}
+                                        </small>
+                                    </span>
+                                </div>
+                            </Link>
+                        ))
+                    }
+                </div>
+            </section>
+        </>
+    )
+}
+export default Home
